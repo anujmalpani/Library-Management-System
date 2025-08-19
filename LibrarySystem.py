@@ -5,10 +5,14 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter import simpledialog
 from PIL import Image, ImageTk
-import mysql.connector as a
-from mysql.connector import Error
+import os
+import sqlite3
+from sqlite3 import Error
+appdata_dir = os.path.join(os.environ["APPDATA"], "LibraryManagementSystem")
+os.makedirs(appdata_dir, exist_ok=True)
+db_path = os.path.join(appdata_dir, "Library")
 #Mysql Connection and Table Setup Query
-con=a.connect(host="localhost",user="root",passwd="ANUJ",database="Library")
+con=sqlite3.connect(db_path)
 try:
     c=con.cursor()
     c.execute('''create table BookIssue(Name varchar(60),Bookcode varchar(50),
@@ -117,7 +121,7 @@ def bookissue():
         if(N=="" or CO=="" or BN=="" or D=="" or DS==""):
             messagebox.showwarning("Empty Set:Cant Insert",parent=BI)
         else:
-            a="insert into BookIssue values(%s,%s,%s,%s,%s);"
+            a="insert into BookIssue values(?,?,?,?,?);"
             data=(N,CO,BN,D,DS)
             c=con.cursor()
             c.execute(a,data)
@@ -202,12 +206,12 @@ def bookdeposit():
             messagebox.showwarning("Empty Set:Cant Insert",parent=BD)
         else:
             c=con.cursor() 
-            a='''update BookIssue set Deposit_status=%s where Name=%s and Bookcode=%s
-            and Bookname=%s;'''
+            a='''update BookIssue set Deposit_status=? where Name=? and Bookcode=?
+            and Bookname=?;'''
             data1=(DS,N,CO,BN)
             c.execute(a,data1)
             con.commit()
-            b='''insert into BookDeposit values(%s,%s,%s,%s);'''
+            b='''insert into BookDeposit values(?,?,?,?);'''
             data2=(N,CO,BN,D)
             c=con.cursor()
             c.execute(b,data2)
@@ -312,7 +316,7 @@ def admin():
             if(N=="" or M=="" or E=="" or ADH=="" or LID==""):
                 messagebox.showwarning("Empty Set:Cant Insert",parent=SR)
             else:
-                a="insert into Student values(%s,%s,%s,%s,%s);"
+                a="insert into Student values(?,?,?,?,?);"
                 data=(N,M,E,ADH,LID)
                 c=con.cursor()
                 c.execute(a,data)
@@ -396,8 +400,8 @@ def admin():
             if(N=="" or M=="" or E=="" or ADH=="" or LID==""):
                 messagebox.showwarning("Empty Set:Cant Update",parent=MSR)
             else:
-                a='''update Student set Name=%s,Mobile_No=%s,Email_ID=%s,
-                     Aadhar_No=%s where LibraryID=%s;'''
+                a='''update Student set Name=?,Mobile_No=?,Email_ID=?,
+                     Aadhar_No=? where LibraryID=?;'''
                 data=(N,M,E,ADH,LID)
                 c=con.cursor()
                 c.execute(a,data)
@@ -496,7 +500,7 @@ def admin():
         #Display Button Function
         def show():
             Input=simpledialog.askstring("Input","Enter Library-ID",parent=DSS)
-            a="select * from Student where LibraryID=%s;"
+            a="select * from Student where LibraryID=?;"
             data=(Input,)
             c=con.cursor()
             c.execute(a,data)
@@ -598,7 +602,7 @@ def admin():
                 messagebox.showwarning("Empty Set:Cant Insert",parent=BR)
             else:
                 data=(BN,BA,CO,T,S)
-                a="insert into Bookinfo values(%s,%s,%s,%s,%s);"
+                a="insert into Bookinfo values(?,?,?,?,?);"
                 c=con.cursor()
                 c.execute(a,data)
                 con.commit()
@@ -682,8 +686,8 @@ def admin():
                 messagebox.showwarning("Empty Set:Cant Update",parent=MBR)
             else:
                 data=(BN,BA,T,S,CO)
-                a='''update Bookinfo set Bookname=%s,Authorname=%s,
-                     Total=%s,Subject=%s where Book_code=%s;'''
+                a='''update Bookinfo set Bookname=?,Authorname=?,
+                     Total=?,Subject=? where Book_code=?;'''
                 c=con.cursor()
                 c.execute(a,data)
                 con.commit()
@@ -781,7 +785,7 @@ def admin():
         #Display Button Function
         def show():
             Input=simpledialog.askstring("Input","Enter Book-Code",parent=DSB)
-            a="select * from Bookinfo where Book_code=%s;"
+            a="select * from Bookinfo where Book_code=?;"
             data=(Input,)
             c=con.cursor()
             c.execute(a,data)
@@ -848,7 +852,7 @@ def admin():
             if(CO==""):
                 messagebox.showwarning("Can't delete",parent=DR)
             else:
-                a="delete from Bookinfo where Book_code=%s;"
+                a="delete from Bookinfo where Book_code=?;"
                 data=(CO,)
                 c=con.cursor()
                 c.execute(a,data)
@@ -868,7 +872,7 @@ def admin():
             if(LID==""):
                 messagebox.showwarning("Can't delete",parent=DR)
             else:
-                a="delete from Student where LibraryID=%s;"
+                a="delete from Student where LibraryID=?;"
                 data=(LID,)
                 c=con.cursor()
                 c.execute(a,data)
@@ -1021,7 +1025,7 @@ def admin():
         #Display Button Function
         def show():
             Input=simpledialog.askstring("Input","Enter Student Name",parent=DBI)
-            a="select * from BookIssue where Name=%s;"
+            a="select * from BookIssue where Name=?;"
             data=(Input,)
             c=con.cursor()
             c.execute(a,data)
