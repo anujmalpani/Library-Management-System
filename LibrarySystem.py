@@ -8,6 +8,15 @@ from PIL import Image, ImageTk
 import os
 import sqlite3
 from sqlite3 import Error
+import sys
+def resource_path(relative_path):
+    try:
+        # When compiled with PyInstaller
+        base_path = sys._MEIPASS
+    except Exception:
+        # When running from source
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 appdata_dir = os.path.join(os.environ["APPDATA"], "LibraryManagementSystem")
 os.makedirs(appdata_dir, exist_ok=True)
 db_path = os.path.join(appdata_dir, "Library")
@@ -1072,7 +1081,7 @@ Nav.pack()
 #image container
 img_width = x
 img_height = y // 2
-original_image = Image.open(r"C:\Users\anujm\OneDrive\Desktop\AUR\Python\LMSimage.png")
+original_image = Image.open(resource_path("LMSimage.jpg"))
 resized_image = original_image.resize((img_width, img_height), Image.LANCZOS)
 I1 = ImageTk.PhotoImage(resized_image)
 Imagelabel=Label(LMS,width=x,height=y//2,bg="blue",image=I1)
